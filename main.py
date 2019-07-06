@@ -8,37 +8,6 @@ from smt.rpi.nats.messaging.CServiceMessaging import CServiceMessaging
 
 
 async def kaskad():
-    # import serial
-    # GPIO.setmode(GPIO.BOARD)
-    # GPIO.setup(11, GPIO.OUT)
-    # GPIO.setup(15, GPIO.OUT)
-    #
-    # serial = serial.Serial(
-    #     port='/dev/ttyAMA0',
-    #     baudrate=9600,
-    #     parity=serial.PARITY_NONE,
-    #     bytesize=serial.EIGHTBITS,
-    #     stopbits=serial.STOPBITS_ONE,
-    #     timeout=2,
-    #     rtscts=True
-    # )
-    #
-    # print('Connected:', serial.isOpen())
-    # print("Connected to: " + serial.portstr)
-    #
-    # GPIO.output(11, GPIO.LOW)  # set high/transmit
-    # GPIO.output(15, GPIO.HIGH)  # set high/transmit
-    # data = '020401010004a1c6'
-    # b = bytes.fromhex(data)
-    # print("Writing...")
-    # serial.write(b)
-    # print("Written.")
-    # GPIO.output(15, GPIO.LOW)  # pin set to low/receive
-    # GPIO.output(11, GPIO.HIGH)  # pin set to low/receive
-    # ReceivedData = ""
-    # while ReceivedData == "":
-    #     RecievedData = serial.readall()
-    #     print(ReceivedData)
 
     print("Начало работы программы.")
     messaging = CServiceMessaging()
@@ -85,11 +54,11 @@ async def main():
 
 
 if __name__ == '__main__':
-    # asyncio.run(main())
-    ioloop = asyncio.get_event_loop()
-    tasks = [ioloop.create_task(main())]
-    wait_tasks = asyncio.wait(tasks)
-    ioloop.run_until_complete(wait_tasks)
-    ioloop.close()
+    asyncio.run(main())
+    # ioloop = asyncio.get_event_loop()
+    # tasks = [ioloop.create_task(main())]
+    # wait_tasks = asyncio.wait(tasks)
+    # ioloop.run_until_complete(wait_tasks)
+    # ioloop.close()
 
 

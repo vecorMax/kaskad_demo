@@ -24,15 +24,15 @@ class CServiceMessaging:
     # ***************************************************************************************************
     async def __connect(self):
         if not self.__nc.is_connected:
-            logging.info("Establishing connection to NATS server.")
+            logging.info(" Establishing connection to NATS server.")
             try:
-                # await self.__nc.connect("192.168.1.104", loop=asyncio.get_running_loop())
-                await self.__nc.connect("192.168.1.104", loop=asyncio.get_event_loop())
-                logging.info("Connection to NATS server is established.")
+                await self.__nc.connect("192.168.1.104", loop=asyncio.get_running_loop())
+                # await self.__nc.connect("192.168.1.104", loop=asyncio.get_event_loop())
+                logging.info(" Connection to NATS server is established.")
                 # await CServiceMessaging.receive(self)
                 # logging.info("Created receiver messages from the server NATS")
             except ErrNoServers as e:
-                logging.error("Cannot connect to NATS server.", e)
+                logging.error(" Cannot connect to NATS server.", e)
 
     # ***************************************************************************************************
     # Отправка сообщения на сервер NATS.                                                                *
@@ -43,12 +43,11 @@ class CServiceMessaging:
             return
         try:
             # await self.__nc.publish("TEMP_IN_DEVICE_FROM_SERVER", message.encode("UTF-8"))
-            logging.info("Publishing the message by subject.")
+            logging.info(" Publishing the message by subject.")
             await self.__nc.publish("TEMP_IN_DEVICE_FROM_SERVER", bytes(message))
-            logging.info("Message was successfully published!")
+            logging.info(" Message was successfully published!")
         except Exception as e:
-            logging.error("Exception - ", e)
-
+            logging.error(" Exception.", e)
 
     # ***************************************************************************************************
     # Завершение работы, закрытие соединения с сервером.                                                *
@@ -56,9 +55,9 @@ class CServiceMessaging:
     async def close(self):
         if not self.__nc.is_connected:
             return
-        logging.info("Closing connection to NATS server.")
+        logging.info(" Closing connection to NATS server.")
         await self.__nc.close()
-        logging.info("Connection to NATS server closed.")
+        logging.info(" Connection to NATS server closed.")
 
     # # ***************************************************************************************************
     # # Получение сообщения с сервера NATS.                                                               *
