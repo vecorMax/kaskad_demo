@@ -4,6 +4,8 @@
 # *******************************************************************************************************
 import asyncio
 import logging
+import json
+import datetime
 from nats.aio.client import Client as NATSClientLibrary
 from nats.aio.errors import ErrNoServers
 
@@ -24,15 +26,14 @@ class CServiceMessaging:
     # ***************************************************************************************************
     async def __connect(self):
         if not self.__nc.is_connected:
-            logging.info(" Establishing connection to NATS server.")
+            logging.info(str(datetime.datetime.now()) + " Establishing connection to NATS server.")
             try:
                 await self.__nc.connect("192.168.1.104", loop=asyncio.get_running_loop())
-                # await self.__nc.connect("192.168.1.104", loop=asyncio.get_event_loop())
-                logging.info(" Connection to NATS server is established.")
-                # await CServiceMessaging.receive(self)
-                # logging.info("Created receiver messages from the server NATS")
+                logging.info(str(datetime.datetime.now()) + " Connection to NATS server is established.")
+                await CServiceMessaging.receive(self)
+                logging.info(str(datetime.datetime.now()) + " Created receiver messages from external devices to NATS server")
             except ErrNoServers as e:
-                logging.error(" Cannot connect to NATS server.", e)
+                logging.error(str(datetime.datetime.now()) + " Cannot connect to NATS server.", e)
 
     # ***************************************************************************************************
     # Отправка сообщения на сервер NATS.                                                                *
@@ -43,11 +44,11 @@ class CServiceMessaging:
             return
         try:
             # await self.__nc.publish("TEMP_IN_DEVICE_FROM_SERVER", message.encode("UTF-8"))
-            logging.info(" Publishing the message by subject.")
+            logging.info(str(datetime.datetime.now()) + " Publishing the message by subject to NATS server.")
             await self.__nc.publish("TEMP_IN_DEVICE_FROM_SERVER", bytes(message))
-            logging.info(" Message was successfully published!")
+            logging.info(str(datetime.datetime.now()) + " Message was successfully published to NATS server!")
         except Exception as e:
-            logging.error(" Exception.", e)
+            logging.error(str(datetime.datetime.now()) + " Exception.", e)
 
     # ***************************************************************************************************
     # Завершение работы, закрытие соединения с сервером.                                                *
@@ -55,30 +56,30 @@ class CServiceMessaging:
     async def close(self):
         if not self.__nc.is_connected:
             return
-        logging.info(" Closing connection to NATS server.")
+        logging.info(str(datetime.datetime.now()) + " Closing connection to NATS server.")
         await self.__nc.close()
-        logging.info(" Connection to NATS server closed.")
+        logging.info(str(datetime.datetime.now()) + " Connection to NATS server closed.")
 
-    # # ***************************************************************************************************
-    # # Получение сообщения с сервера NATS.                                                               *
-    # # ***************************************************************************************************
-    # async def receive(self):
-    #     if not self.__nc.is_connected:
-    #         return
-    #
-    #     async def message_handler(msg):
-    #         data = json.loads(msg.data.decode())
-    #
-    #         uuid = data['UUID']
-    #         obj_meas = data['ObjectMeasure']
-    #         cur_time = data['CurrentTime']
-    #         delay_temp = data['Delay']
-    #
-    #         CServiceMessaging.change_delay(delay_temp, 0)
-    #
-    #         print(data)
-    #
-    #     await self.__nc.subscribe("TEMP_FROM_DEVICE_TO_SERVER", cb=message_handler)
+    # ***************************************************************************************************
+    # Получение сообщения с сервера NATS.                                                               *
+    # ***************************************************************************************************
+    async def receive(self):
+        if not self.__nc.is_connected:
+            return
+
+        async def message_handler(msg):
+            data = json.loads(msg.data.decode())
+
+            uuid = data['UUID']
+            obj_meas = data['ObjectMeasure']
+            cur_time = data['CurrentTime']
+            delay_temp = data['Delay']
+
+            # CServiceMessaging.change_delay(delay_temp, 0)
+
+            print(data)
+
+        await self.__nc.subscribe("TEMP_FROM_DEVICE_TO_SERVER", cb=message_handler)
 
     # # ***************************************************************************************************
     # # Обновление частоты опроса датчика                                                                 *
